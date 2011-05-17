@@ -10,9 +10,9 @@ sandbox a process inside a new network namespace
 		<environment insert="" mode="prepend" name="PYTHONPATH"/>
 		<requires interface="http://gfxmonk.net/dist/0install/python-unshare.xml"/>
 		<requires interface="http://gfxmonk.net/dist/0install/selective-chroot.xml"/>
+		<implementation id="sha1new=3c738bf5e914d693c6649663495227ad7c5caa26" released="2011-05-14" version="0.1">
+			<manifest-digest sha256="ab2470c0eca44c37c107d021aedc362e01065464ada46be0919d202068c0cabe"/>
+			<archive href="http://gfxmonk.net/dist/0install/net-sandbox/net-sandbox-0.1.tgz" size="880"/>
+		</implementation>
 	</group>
-	<implementation id="sha1new=3c738bf5e914d693c6649663495227ad7c5caa26" released="2011-05-14" version="0.1">
-		<manifest-digest sha256="ab2470c0eca44c37c107d021aedc362e01065464ada46be0919d202068c0cabe"/>
-		<archive href="http://gfxmonk.net/dist/0install/net-sandbox/net-sandbox-0.1.tgz" size="880"/>
-	</implementation>
 </interface>
