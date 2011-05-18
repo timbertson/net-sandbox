@@ -15,9 +15,9 @@ def main():
 	from optparse import OptionParser
 	p = OptionParser()
 	p.add_option('-b', '--base', default='/tmp/chroot.rootfs')
-	p.add_option('--init', help='init script', default=None)
 	p.add_option('-u', '--user', help='user to run script as (default: guessed from $SUDO_USER)', default=None)
 	p.add_option('-s', '--shadow', action='append', default=[], dest='shadow_dirs', help='directories to shadow (can be specified multiple times)')
+	p.add_option('-i', '--init', default=None, help='init command (run as root)')
 	unshare_flag_names = filter(lambda c: c.startswith("CLONE_"), dir(unshare))
 	unshare_flag_desc = "(any of: %s)" % (", ".join(unshare_flag_names),)
 	p.add_option('-n', '--unshare', action='append', default=[], dest='unshare_flags', help='flags to unshare (may be specified multiple times) ' + unshare_flag_desc)
@@ -29,18 +29,19 @@ def main():
 	base = opts.base
 	shadow_dirs = opts.shadow_dirs or ['/tmp', '/var']
 	unshare_flags = 0
-	for flag_name in opts.unshare_flags or ['CLONE_NEWNS', 'CLONE_NEWNET', 'CLONE_NEWPID']:
+	for flag_name in opts.unshare_flags or ['CLONE_NEWNS', 'CLONE_NEWNET']:
 		unshare_flags |= getattr(unshare, flag_name)
 
 	def namespaced_action():
-		unshare.unshare(unshare.CLONE_NEWNS | unshare.CLONE_NEWNET)
+		unshare.unshare(unshare_flags)
 
 		def chroot_action():
+			os.environ['NET_SANDBOX'] = 'true'
 			for d in shadow_dirs:
 				subprocess.check_call(['chown', user, d])
 			subprocess.check_call(['ifconfig', 'lo', 'up'])
 			if opts.init:
-				subprocess.check_call([opts.init])
+				subprocess.check_call(['bash','-c',opts.init])
 			def user_action():
 				subprocess.check_call(args or ['bash', '-i'])
 			selective_chroot.execute_as_user(user_action, user=user)
@@ -54,6 +55,12 @@ def main():
 	return ret
 
 if __name__ == '__main__':
+	PID_UNSHARED = 'PID_UNSHARED'
+	if PID_UNSHARED not in os.environ:
+		os.environ[PID_UNSHARED] = 'true'
+		unshare_pid = os.path.join(os.path.dirname(sys.argv[0]), 'unshare-pid')
+		os.execv(unshare_pid, [sys.argv[0]] + sys.argv)
+	print "unshared; here we go!"
 	try:
 		ret = main()
 	except Usage, e:

@@ -18,5 +18,9 @@ sandbox a process inside a new network namespace
 			<manifest-digest sha256="5f1d2bc50c73d2458e1100f9114eb33c36fc19f1dc84240e205768d1a3fcfc67"/>
 			<archive href="http://gfxmonk.net/dist/0install/net-sandbox/net-sandbox-0.1.1.tgz" size="1060"/>
 		</implementation>
+		<implementation id="sha1new=dc78e822abb90c587290e57bf8b36f50bcde84c9" released="2011-05-18" version="0.1.2">
+			<manifest-digest sha256="0a816b84ed4aeb14e1d3cee4b88f871921108aca37b21d38177a6d08efaa927b"/>
+			<archive href="http://gfxmonk.net/dist/0install/net-sandbox/net-sandbox-0.1.2.tgz" size="1073"/>
+		</implementation>
 	</group>
 </interface>
