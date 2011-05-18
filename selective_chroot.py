@@ -82,8 +82,13 @@ def create_fs_mirror(base, shadow_dirs, dry_run=False):
 
 	mounted_dirs = []
 	def bind_mount(path):
+		if path == '/proc':
+			# procfs will be auto mounted without arguments
+			args = []
+		else:
+			args = ['--bind', path]
 		run_cmd(['mkdir','-p', chroot_path(path)], silent=True)
-		run_cmd(['mount','--bind', path, chroot_path(path)])
+		run_cmd(['mount'] + args + [chroot_path(path)])
 		mounted_dirs.append(chroot_path(path))
 	
 	def mkdir_p(path):
