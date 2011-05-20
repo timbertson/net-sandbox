@@ -17,6 +17,9 @@ def clobber(ctx):
 def all(ctx):
 	ctx.exec_command('waf configure build install')
 
+def g0(ctx):
+	ctx.exec_command('mkzero-gfxmonk -p wscript -p net_sandbox.py -p unshare-pid.c net-sandbox.xml')
+
 def build(bld):
 	bld.install_files('${PREFIX}/lib/python', ['net_sandbox.py'])
 	bld.program(

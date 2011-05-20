@@ -12,5 +12,9 @@ create a chroot that mirrors selected parts of the root filesystem using bind mo
 			<manifest-digest sha256="0311e14da4c2155f20fd2ba8c9299371b2983729aaee87abb445737ddbce4fa1"/>
 			<archive href="http://gfxmonk.net/dist/0install/selective-chroot/selective-chroot-0.1.tgz" size="1356"/>
 		</implementation>
+		<implementation id="sha1new=36ff033d12e9f5a8ece7e754624df50d7ff63aff" released="2011-05-20" version="0.1.2">
+			<manifest-digest sha256="4d5336546a4fc912c66cb1548f25f5596dab05601f53ea44a73c9fff4f608495"/>
+			<archive href="http://gfxmonk.net/dist/0install/selective-chroot/selective-chroot-0.1.2.tgz" size="1469"/>
+		</implementation>
 	</group>
 </interface>

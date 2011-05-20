@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type='text/xsl' href='interface.xsl'?>
-<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface" uri="http://gfxmonk.net/dist/0install/net-sandbox.xml" xmlns:compile="http://zero-install.sourceforge.net/2006/namespaces/0compile">
+<interface xmlns="http://zero-install.sourceforge.net/2004/injector/interface" xmlns:compile="http://zero-install.sourceforge.net/2006/namespaces/0compile" uri="http://gfxmonk.net/dist/0install/net-sandbox.xml">
 	<name>net-sandbox</name>
 	<summary>sandbox a process inside a new network namespace</summary>
 	<description>
 sandbox a process inside a new network namespace
 	</description>
-
 	<group arch="*-src" compile:dup-src="true" compile:min-version="0.23">
 		<command name="compile" shell-command="cd &quot;$BUILDDIR&quot; &amp;&amp; waf all">
 			<requires interface="http://gfxmonk.net/dist/0install/python-devel.xml"/>
+			<requires interface="http://gfxmonk.net/dist/0install/waf.xml"/>
 			<compile:implementation>
 				<environment insert="lib/python" mode="prepend" name="PYTHONPATH"/>
 				<environment insert="bin" mode="prepend" name="PATH"/>
@@ -22,6 +22,9 @@ sandbox a process inside a new network namespace
 				</command>
 			</compile:implementation>
 		</command>
-		<implementation id="." version="0.1.2"/>
+		<implementation id="sha1new=b54f6394154532c032c916cd84bb0ecb7193e977" released="2011-05-20" version="0.1.2">
+			<manifest-digest sha256="289c0d9a308e8e4b57161e261942a599f56220f5cc8433e3f3f19c6a4079d4da"/>
+			<archive href="http://gfxmonk.net/dist/0install/net-sandbox/net-sandbox-0.1.2.tgz" size="2159"/>
+		</implementation>
 	</group>
 </interface>
