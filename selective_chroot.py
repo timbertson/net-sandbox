@@ -3,6 +3,8 @@
 import os,sys
 import subprocess
 from optparse import OptionParser
+SYSTEM_MOUNTPOINTS = set(['/proc', '/sys'])
+
 def main():
 	p = OptionParser(usage="%prog [OPTIONS] cmd")
 	p.add_option('-b', '--base')
@@ -19,11 +21,14 @@ def chroot(base, shadow_dirs, action, dry_run=False):
 	mounted_dirs = create_fs_mirror(base, shadow_dirs, dry_run)
 	def _action():
 		os.chroot(base)
+		for system_dir in SYSTEM_MOUNTPOINTS:
+			_run_cmd(['mount', system_dir], dry_run=dry_run)
 		return action()
 	ret = in_subprocess(_action)
 	return ret, mounted_dirs
 
 def in_subprocess(func):
+	"""a helper to run a function in a subprocess"""
 	child_pid = os.fork()
 	if child_pid == 0:
 		func()
@@ -82,13 +87,10 @@ def create_fs_mirror(base, shadow_dirs, dry_run=False):
 
 	mounted_dirs = []
 	def bind_mount(path):
-		if path == '/proc':
-			# procfs will be auto mounted without arguments
-			args = []
-		else:
-			args = ['--bind', path]
 		run_cmd(['mkdir','-p', chroot_path(path)], silent=True)
-		run_cmd(['mount'] + args + [chroot_path(path)])
+		if path not in SYSTEM_MOUNTPOINTS:
+			# procfs / sysfs will be auto mounted without arguments
+			run_cmd(['mount', '--bind', path, chroot_path(path)])
 		mounted_dirs.append(chroot_path(path))
 	
 	def mkdir_p(path):
@@ -108,8 +110,6 @@ def create_fs_mirror(base, shadow_dirs, dry_run=False):
 				keep = True
 			if not keep:
 				dirnames.remove(dirname)
-		#for filename in filenames:
-		#	bind_mount(os.path.join(path, filename))
 	
 	return mounted_dirs
 

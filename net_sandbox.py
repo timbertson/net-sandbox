@@ -9,9 +9,12 @@ class Usage(RuntimeError):
 	pass
 
 MOUNT_DIRS = []
+DEFAULT_SHADOW_DIRS = ['/tmp', '/var']
+CLONE_NEWPID = 'CLONE_NEWPID'
+DEFAULT_UNSHARE_FLAGS = ['CLONE_NEWNS', 'CLONE_NEWNET', CLONE_NEWPID]
+DEFAULT_CMD = ['bash', '-i']
 
 def main():
-	global MOUNT_DIRS
 	from optparse import OptionParser
 	p = OptionParser()
 	p.add_option('-b', '--base', default='/tmp/chroot.rootfs')
@@ -24,28 +27,54 @@ def main():
 
 	opts, args = p.parse_args()
 	if not os.geteuid() == 0:
-		raise Usage("must be root!")
-	user = opts.user or os.environ['SUDO_USER']
-	base = opts.base
-	shadow_dirs = opts.shadow_dirs or ['/tmp', '/var']
+		raise Usage("you must be root!")
+	return sandbox(unshare_flag_names = opts.unshare_flags or DEFAULT_UNSHARE_FLAGS,
+			shadow_dirs = opts.shadow_dirs or DEFAULT_SHADOW_DIRS,
+			chroot_base = opts.base,
+			init_expr = opts.init,
+			user = opts.user,
+			cmd = args or DEFAULT_CMD)
+
+def sandbox(unshare_flag_names = DEFAULT_UNSHARE_FLAGS,
+	shadow_dirs = DEFAULT_SHADOW_DIRS,
+	chroot_base='/tmp/chroot.rootfs',
+	init_expr=None,
+	user=None,
+	cmd = DEFAULT_CMD):
+
+	user = user or os.environ['SUDO_USER']
+
+	unshare_flag_names = unshare_flag_names[:]
 	unshare_flags = 0
-	for flag_name in opts.unshare_flags or ['CLONE_NEWNS', 'CLONE_NEWNET']:
+	needs_pid_unshare = CLONE_NEWPID in unshare_flag_names
+	if needs_pid_unshare:
+		# this flag does not work with unshare, as it relies on a fork(). So just re-execute this
+		# script with the same arguments after a call to the unshare-pid tool.
+		unshare_flag_names.remove(CLONE_NEWPID)
+		if CLONE_NEWPID not in os.environ:
+			os.environ[CLONE_NEWPID] = 'true'
+			os.execv('unshare-pid', [sys.argv[0]] + sys.argv)
+		else:
+			del os.environ[CLONE_NEWPID]
+
+	for flag_name in unshare_flag_names:
 		unshare_flags |= getattr(unshare, flag_name)
 
 	def namespaced_action():
+		global MOUNT_DIRS
 		unshare.unshare(unshare_flags)
+		os.environ['SANDBOX'] = 'true'
 
 		def chroot_action():
-			os.environ['NET_SANDBOX'] = 'true'
 			for d in shadow_dirs:
 				subprocess.check_call(['chown', user, d])
 			subprocess.check_call(['ifconfig', 'lo', 'up'])
-			if opts.init:
-				subprocess.check_call(['bash','-c',opts.init])
+			if init_expr:
+				subprocess.check_call(['bash','-c', init_expr])
 			def user_action():
-				subprocess.check_call(args or ['bash', '-i'])
+				subprocess.check_call(cmd)
 			selective_chroot.execute_as_user(user_action, user=user)
-		ret, MOUNT_DIRS = selective_chroot.chroot(base=base, shadow_dirs=shadow_dirs, action=chroot_action)
+		ret, MOUNT_DIRS = selective_chroot.chroot(base=chroot_base, shadow_dirs=shadow_dirs, action=chroot_action)
 		return ret
 	
 	ret = selective_chroot.in_subprocess(namespaced_action)
@@ -55,17 +84,13 @@ def main():
 	return ret
 
 if __name__ == '__main__':
-	PID_UNSHARED = 'PID_UNSHARED'
-	if PID_UNSHARED not in os.environ:
-		os.environ[PID_UNSHARED] = 'true'
-		unshare_pid = os.path.join(os.path.dirname(sys.argv[0]), 'unshare-pid')
-		os.execv(unshare_pid, [sys.argv[0]] + sys.argv)
-	print "unshared; here we go!"
 	try:
 		ret = main()
 	except Usage, e:
 		print >> sys.stderr, e
+		ret = 2
+	except subprocess.CalledProcessError:
 		ret = 1
 	except KeyboardInterrupt:
-		ret = 1
+		ret = 3
 	sys.exit(ret)
