@@ -8,7 +8,7 @@ sandbox a process inside a new network namespace
 	</description>
 	<group arch="*-src" compile:min-version="0.23">
 		<command name="compile" shell-command="scons -C &quot;$SRCDIR&quot; &quot;$DISTDIR&quot;">
-			<requires interface="http://gfxmonk.net/dist/0install/python-devel.xml"/>
+			<requires interface="http://gfxmonk.net/dist/0install/python2.7-devel.xml"/>
 			<requires interface="http://gfxmonk.net/dist/0install/scons.xml"/>
 			<compile:implementation>
 				<environment insert="lib/python" mode="prepend" name="PYTHONPATH"/>
