@@ -22,9 +22,9 @@ sandbox a process inside a new network namespace
 				</command>
 			</compile:implementation>
 		</command>
-		<implementation id="sha1new=cad49be202cf7a8dd3b041396aaefa6c6b3bbb86" released="2011-05-23" version="0.1.3">
-			<manifest-digest sha256="7bb161ffa77187f96eb4cde633134e77c153ff9d977920c07a486d21fa291cbd"/>
-			<archive href="http://gfxmonk.net/dist/0install/net-sandbox/net-sandbox-0.1.3.tgz" size="2160"/>
+		<implementation id="sha1new=086388376ca4f51b95311e4b999f47d9dc6bda7b" released="2011-05-27" version="0.1.3">
+			<manifest-digest sha256="632762ce97c29395f9b2c60d1a3e558836a2cdeff42a27852f54816190bdc2b4"/>
+			<archive href="http://gfxmonk.net/dist/0install/net-sandbox/net-sandbox-0.1.3.tgz" size="2484"/>
 		</implementation>
 	</group>
 </interface>
