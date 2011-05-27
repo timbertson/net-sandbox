@@ -53,7 +53,7 @@ def sandbox(unshare_flag_names = DEFAULT_UNSHARE_FLAGS,
 		unshare_flag_names.remove(CLONE_NEWPID)
 		if CLONE_NEWPID not in os.environ:
 			os.environ[CLONE_NEWPID] = 'true'
-			os.execv('unshare-pid', [sys.argv[0]] + sys.argv)
+			os.execvp('unshare-pid', [sys.argv[0]] + sys.argv)
 		else:
 			del os.environ[CLONE_NEWPID]
 
