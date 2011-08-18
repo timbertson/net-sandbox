@@ -1,7 +1,7 @@
-dist: clean
+dist: clean phony
 	scons
 
-0:
+0: phony
 	mkzero-gfxmonk -p src -p SConstruct net-sandbox.xml
 
 0compile: phony
@@ -14,7 +14,7 @@ dist: clean
 0compile-run: 0compile
 	0launch `find net-sandbox-local | fgrep /0install/net-sandbox-local.xml`
 
-clean:
+clean: phony
 	rm -rf .build/ net-sandbox-local*
 
 .PHONY: phony
