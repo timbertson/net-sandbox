@@ -91,7 +91,7 @@ def sandbox(unshare_flag_names = DEFAULT_UNSHARE_FLAGS,
 				if cmd == DEFAULT_CMD:
 					print >> sys.stderr, """try:\nexport PS1='\\n<container> \u@\h \w \$ '\n"""
 				subprocess.check_call(cmd)
-			selective_chroot.execute_as_user(user_action, user=user)
+			return selective_chroot.execute_as_user(user_action, user=user)
 		ret, MOUNT_DIRS = selective_chroot.chroot(base=chroot_base, shadow_dirs=shadow_dirs, action=chroot_action)
 		return ret
 	

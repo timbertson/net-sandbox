@@ -31,16 +31,16 @@ def in_subprocess(func):
 	"""a helper to run a function in a subprocess"""
 	child_pid = os.fork()
 	if child_pid == 0:
-		func()
-		os._exit(0)
+		os._exit(func() or 0)
 	else:
 		(pid, status) = os.waitpid(child_pid, 0)
+		status = os.WEXITSTATUS(status)
 		return status
 
 def execute_as_user(func, user=None):
 	def action():
 		become_user(user)
-		func()
+		return func()
 	return in_subprocess(action)
 
 import pwd
