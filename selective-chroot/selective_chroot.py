@@ -22,7 +22,7 @@ def chroot(base, shadow_dirs, action, dry_run=False):
 	def _action():
 		os.chroot(base)
 		for system_dir in SYSTEM_MOUNTPOINTS:
-			_run_cmd(['mount', system_dir], dry_run=dry_run)
+			_run_cmd(['mount', '-n', system_dir], dry_run=dry_run)
 		return action()
 	ret = in_subprocess(_action)
 	return ret, mounted_dirs
@@ -90,7 +90,7 @@ def create_fs_mirror(base, shadow_dirs, dry_run=False):
 		run_cmd(['mkdir','-p', chroot_path(path)], silent=True)
 		if path not in SYSTEM_MOUNTPOINTS:
 			# procfs / sysfs will be auto mounted without arguments
-			run_cmd(['mount', '--bind', path, chroot_path(path)])
+			run_cmd(['mount', '-n', '--bind', path, chroot_path(path)])
 		mounted_dirs.append(chroot_path(path))
 	
 	def mkdir_p(path):
